@@ -50,7 +50,7 @@ export const Skill = skill<LintConfiguration & { repos: any }>({
         glob: {
             type: ParameterType.String,
             displayName: "Files",
-            description: "File, folder or glob pattern to process (defaults to '.')",
+            description: "File, folder or glob pattern to format (defaults to '.')",
             required: false,
         },
         config: {
