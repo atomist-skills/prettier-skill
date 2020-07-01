@@ -64,8 +64,7 @@ export const Skill = skill<LintConfiguration & { repos: any }>({
         args: {
             type: ParameterType.StringArray,
             displayName: "Extra arguments",
-            description:
-                "Additional [command line arguments](https://prettier.io/docs/en/cli.html) passed to Prettier",
+            description: "Additional [command line arguments](https://prettier.io/docs/en/cli.html) passed to Prettier",
             required: false,
         },
         modules: {
