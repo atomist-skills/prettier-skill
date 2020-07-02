@@ -152,9 +152,17 @@ const RunEslintStep: LintStep = {
         const cmd = params.project.path("node_modules", ".bin", "prettier");
         const args: string[] = [];
         const configFile = params.project.path(`prettierrc-${push.after.sha.slice(0, 7)}.json`);
+        const ignoreFile = params.project.path(`.prettierignore-${push.after.sha.slice(0, 7)}`);
         const filesToDelete = [];
 
         cfg.args?.forEach(a => args.push(a));
+
+        // Add .prettierignore if missing
+        if (!(await fs.pathExists(params.project.path(".prettierignore"))) && !!cfg.ignores) {
+            await fs.writeFile(ignoreFile, cfg.ignores.join("\n"));
+            filesToDelete.push(ignoreFile);
+            args.push("--ignore-path", ignoreFile);
+        }
 
         // Add .prettierrc.json if missing
         const configs = await project.globFiles(params.project, ".prettierrc*");

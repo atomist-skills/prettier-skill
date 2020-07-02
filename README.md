@@ -44,6 +44,13 @@ integration is optional.
     
     Use this parameter to provide the file, folder or glob pattern to format with
     Prettier.
+    
+1. **Select files or folders to ignore**
+
+    ![Ignore](docs/images/ignore.png)
+
+    To speed up formatting or avoid formatting specific files, select which files 
+    and folders to ignore. This allows `.gitignore` style pattern. 
 
 1. **Specify an optional Prettier configuration in JSON format**
 

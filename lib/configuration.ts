@@ -18,6 +18,7 @@ import { parameter } from "@atomist/skill";
 
 export interface LintConfiguration {
     glob?: string;
+    ignores?: string[];
     config?: string;
     commitMsg?: string;
     args?: string[];
