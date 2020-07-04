@@ -65,14 +65,6 @@ const SetupStep: LintStep = {
         );
         await ctx.audit.log(`Cloned repository ${repo.owner}/${repo.name} at sha ${push.after.sha.slice(0, 7)}`);
 
-        if (!(await fs.pathExists(params.project.path("package.json")))) {
-            return {
-                code: 1,
-                reason: "Project not an NPM project",
-                visibility: "hidden",
-            };
-        }
-
         const includeGlobs = ctx.configuration?.[0]?.parameters?.glob || ".";
         const matchingFiles = await project.globFiles(params.project, includeGlobs, {
             ignore: [".git", "node_modules"],
@@ -101,19 +93,26 @@ const SetupStep: LintStep = {
 const NpmInstallStep: LintStep = {
     name: "npm install",
     run: async (ctx, params) => {
-        const opts = { env: { ...process.env, NODE_ENV: "development" } };
-        if (await fs.pathExists(params.project.path("package-lock.json"))) {
-            await params.project.spawn("npm", ["ci"], opts);
-        } else {
-            await params.project.spawn("npm", ["install"], opts);
+        let isNpm = true;
+        if (!(await fs.pathExists(params.project.path("package.json")))) {
+            isNpm = false;
         }
 
-        const cfg = ctx.configuration[0].parameters;
-        if (cfg.modules?.length > 0) {
-            await ctx.audit.log("Installing configured NPM packages");
-            await params.project.spawn("npm", ["install", ...cfg.modules, "--save-dev"], opts);
-            await params.project.spawn("git", ["reset", "--hard"], opts);
+        const opts = { env: { ...process.env, NODE_ENV: "development" } };
+        if (isNpm) {
+            if (await fs.pathExists(params.project.path("package-lock.json"))) {
+                await params.project.spawn("npm", ["ci"], opts);
+            } else {
+                await params.project.spawn("npm", ["install"], opts);
+            }
+            const cfg = ctx.configuration[0].parameters;
+            if (cfg.modules?.length > 0) {
+                await ctx.audit.log("Installing configured NPM packages");
+                await params.project.spawn("npm", ["install", ...cfg.modules, "--save-dev"], opts);
+                await params.project.spawn("git", ["reset", "--hard"], opts);
+            }
         }
+
         return {
             code: 0,
         };
@@ -122,6 +121,9 @@ const NpmInstallStep: LintStep = {
 
 const ValidateRepositoryStep: LintStep = {
     name: "validate",
+    runWhen: async (ctx, params) => {
+        return fs.pathExists(params.project.path("package.json"));
+    },
     run: async (ctx, params) => {
         const push = ctx.data.Push[0];
         const repo = push.repo;
@@ -149,7 +151,7 @@ const RunEslintStep: LintStep = {
             ...DefaultLintConfiguration,
             ...ctx.configuration[0].parameters,
         };
-        const cmd = params.project.path("node_modules", ".bin", "prettier");
+
         const args: string[] = [];
         const configFile = params.project.path(`prettierrc-${push.after.sha.slice(0, 7)}.json`);
         const ignoreFile = params.project.path(`.prettierignore-${push.after.sha.slice(0, 7)}`);
@@ -180,14 +182,13 @@ const RunEslintStep: LintStep = {
 
         const argsString = args.join(" ").split(`${params.project.path()}/`).join("");
         await ctx.audit.log(`Running Prettier with: $ prettier ${argsString}`);
-        const lines = [];
-        const result = await params.project.spawn(cmd, args, { log: { write: msg => lines.push(msg) } });
+        const result = await runPrettier(args, ctx, params);
 
         for (const file of filesToDelete) {
             await fs.remove(file);
         }
 
-        if (result.status === 0) {
+        if (result.exitCode === 0) {
             await params.check.update({
                 conclusion: "success",
                 body: `\`prettier\` found code to be formatted properly.
@@ -198,7 +199,7 @@ const RunEslintStep: LintStep = {
                 code: 0,
                 reason: `Prettier found [${repo.owner}/${repo.name}](${repo.url}) to be formatted properly`,
             };
-        } else if (result.status === 1) {
+        } else if (result.exitCode === 1) {
             await params.check.update({
                 conclusion: "action_required",
                 body: `\`prettier\` found code not to be formatted properly.
@@ -210,9 +211,9 @@ const RunEslintStep: LintStep = {
                 code: 0,
                 reason: `Prettier found [${repo.owner}/${repo.name}](${repo.url}) not to be formatted properly`,
             };
-        } else if (result.status === 2) {
+        } else if (result.exitCode === 2) {
             await ctx.audit.log(`Running Prettier failed with configuration or internal error:`, Severity.ERROR);
-            await ctx.audit.log(lines.join("\n"), Severity.ERROR);
+            await ctx.audit.log(result.log, Severity.ERROR);
             await params.check.update({
                 conclusion: "action_required",
                 body: `Running \`prettier\` failed with a configuration error.
@@ -220,7 +221,7 @@ const RunEslintStep: LintStep = {
 \`$ prettier ${argsString}\`
 
 \`\`\`
-${lines.join("\n")}
+${result.log}
 \`\`\``,
             });
             return {
@@ -230,7 +231,7 @@ ${lines.join("\n")}
         } else {
             await params.check.update({
                 conclusion: "action_required",
-                body: `Unknown Prettier exit code: \`${result.status}\``,
+                body: `Unknown Prettier exit code: \`${result.exitCode}\``,
             });
             return {
                 code: 1,
@@ -240,6 +241,35 @@ ${lines.join("\n")}
         }
     },
 };
+
+async function runPrettier(
+    args: string[],
+    ctx: EventContext<LintOnPushSubscription, LintConfiguration>,
+    params: LintParameters,
+): Promise<{ exitCode: number; log: string }> {
+    const lines = [];
+
+    if (await fs.pathExists(params.project.path("package.json"))) {
+        const cmd = params.project.path("node_modules", ".bin", "prettier");
+        const result = await params.project.spawn(cmd, args, { log: { write: msg => lines.push(msg) } });
+        return {
+            exitCode: result.status,
+            log: lines.join("\n"),
+        };
+    } else {
+        const modules = ctx.configuration?.[0]?.parameters?.modules || [];
+        if (!modules.some(m => m === "prettier") && !modules.some(m => m.startsWith("prettier@"))) {
+            modules.push("prettier");
+        }
+        const result = await params.project.spawn("npx", [...modules.map(m => `--package=${m}`), "--quiet", ...args], {
+            log: { write: msg => lines.push(msg) },
+        });
+        return {
+            exitCode: result.status,
+            log: lines.join("\n"),
+        };
+    }
+}
 
 const PushStep: LintStep = {
     name: "push",
