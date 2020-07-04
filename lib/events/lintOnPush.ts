@@ -92,25 +92,22 @@ const SetupStep: LintStep = {
 
 const NpmInstallStep: LintStep = {
     name: "npm install",
+    runWhen: async (ctx, params) => {
+        return fs.pathExists(params.project.path("package.json"));
+    },
     run: async (ctx, params) => {
-        let isNpm = true;
-        if (!(await fs.pathExists(params.project.path("package.json")))) {
-            isNpm = false;
+        const opts = { env: { ...process.env, NODE_ENV: "development" } };
+        if (await fs.pathExists(params.project.path("package-lock.json"))) {
+            await params.project.spawn("npm", ["ci"], opts);
+        } else {
+            await params.project.spawn("npm", ["install"], opts);
         }
 
-        const opts = { env: { ...process.env, NODE_ENV: "development" } };
-        if (isNpm) {
-            if (await fs.pathExists(params.project.path("package-lock.json"))) {
-                await params.project.spawn("npm", ["ci"], opts);
-            } else {
-                await params.project.spawn("npm", ["install"], opts);
-            }
-            const cfg = ctx.configuration[0].parameters;
-            if (cfg.modules?.length > 0) {
-                await ctx.audit.log("Installing configured NPM packages");
-                await params.project.spawn("npm", ["install", ...cfg.modules, "--save-dev"], opts);
-                await params.project.spawn("git", ["reset", "--hard"], opts);
-            }
+        const cfg = ctx.configuration[0].parameters;
+        if (cfg.modules?.length > 0) {
+            await ctx.audit.log("Installing configured NPM packages");
+            await params.project.spawn("npm", ["install", ...cfg.modules, "--save-dev"], opts);
+            await params.project.spawn("git", ["reset", "--hard"], opts);
         }
 
         return {
@@ -168,7 +165,9 @@ const RunEslintStep: LintStep = {
 
         // Add .prettierrc.json if missing
         const configs = await project.globFiles(params.project, ".prettierrc*");
-        const pj = await fs.readJson(params.project.path("package.json"));
+        const pj = (await fs.pathExists(params.project.path("package.json")))
+            ? await fs.readJson(params.project.path("package.json"))
+            : {};
         if (configs.length === 0 && !pj.prettier && !!cfg.config) {
             await fs.writeFile(configFile, cfg.config);
             filesToDelete.push(configFile);
