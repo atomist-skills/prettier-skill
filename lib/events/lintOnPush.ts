@@ -260,9 +260,13 @@ async function runPrettier(
         if (!modules.some(m => m === "prettier") && !modules.some(m => m.startsWith("prettier@"))) {
             modules.push("prettier");
         }
-        const result = await params.project.spawn("npx", [...modules.map(m => `--package=${m}`), "--quiet", ...args], {
-            log: { write: msg => lines.push(msg) },
-        });
+        const result = await params.project.spawn(
+            "npx",
+            [...modules.map(m => `--package=${m}`), "--quiet", "prettier", ...args],
+            {
+                log: { write: msg => lines.push(msg) },
+            },
+        );
         return {
             exitCode: result.status,
             log: lines.join("\n"),
