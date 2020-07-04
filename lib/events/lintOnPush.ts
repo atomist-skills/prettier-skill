@@ -249,6 +249,11 @@ async function runPrettier(
     const lines = [];
 
     if (await fs.pathExists(params.project.path("package.json"))) {
+        // If project is NPM-based we can run prettier through the installed bin
+        // This works for project providing their own prettier set up or when we
+        // installed the configured packages from the skill configuration.
+        // Here we don't default to a prettier version and require it to either
+        // come from the package.json or skill configuration.
         const cmd = params.project.path("node_modules", ".bin", "prettier");
         const result = await params.project.spawn(cmd, args, { log: { write: msg => lines.push(msg) } });
         return {
@@ -256,6 +261,8 @@ async function runPrettier(
             log: lines.join("\n"),
         };
     } else {
+        // If project does not have a package.json, we can still run prettier through npx
+        // by installing all modules as packages to npx and making sure that at least prettier gets installed
         const modules = ctx.configuration?.[0]?.parameters?.modules || [];
         if (!modules.some(m => m === "prettier") && !modules.some(m => m.startsWith("prettier@"))) {
             modules.push("prettier");
