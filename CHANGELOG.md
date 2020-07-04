@@ -10,6 +10,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 -   Initial version. [0d5c4d9](https://github.com/atomist-skills/prettier-skill/commit/0d5c4d90acb24e3b8bcf5c7438d71178eeb770bc)
--   Initial version. [7119458](https://github.com/atomist-skills/prettier-skill/commit/7119458b22670193158a36fd1e8fdfdf46422136)
 -   Add support for .prettierignore. [#3](https://github.com/atomist-skills/prettier-skill/issues/3)
 -   Add support running prettier on non NPM projects. [#6](https://github.com/atomist-skills/prettier-skill/issues/6)
