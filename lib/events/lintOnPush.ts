@@ -25,6 +25,7 @@ import {
     secret,
     Step,
     status,
+    childProcess,
 } from "@atomist/skill";
 import { Severity } from "@atomist/skill-logging";
 import * as fs from "fs-extra";
@@ -227,8 +228,6 @@ async function runPrettier(
     ctx: EventContext<LintOnPushSubscription, LintConfiguration>,
     params: LintParameters,
 ): Promise<{ exitCode: number; log: string }> {
-    const lines = [];
-
     if (await fs.pathExists(params.project.path("package.json"))) {
         // If project is NPM-based we can run prettier through the installed bin
         // This works for project providing their own prettier set up or when we
@@ -236,10 +235,11 @@ async function runPrettier(
         // Here we don't default to a prettier version and require it to either
         // come from the package.json or skill configuration.
         const cmd = params.project.path("node_modules", ".bin", "prettier");
-        const result = await params.project.spawn(cmd, args, { log: { write: msg => lines.push(msg) } });
+        const captureLog = childProcess.captureLog();
+        const result = await params.project.spawn(cmd, args, { log: captureLog });
         return {
             exitCode: result.status,
-            log: lines.join("\n"),
+            log: captureLog.log.trim(),
         };
     } else {
         // If project does not have a package.json, we can still run prettier through npx
@@ -248,16 +248,17 @@ async function runPrettier(
         if (!modules.some(m => m === "prettier") && !modules.some(m => m.startsWith("prettier@"))) {
             modules.push("prettier");
         }
+        const captureLog = childProcess.captureLog();
         const result = await params.project.spawn(
             "npx",
             [...modules.map(m => `--package=${m}`), "--quiet", "prettier", ...args],
             {
-                log: { write: msg => lines.push(msg) },
+                log: captureLog,
             },
         );
         return {
             exitCode: result.status,
-            log: lines.join("\n"),
+            log: captureLog.log.trim(),
         };
     }
 }
