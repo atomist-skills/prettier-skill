@@ -236,7 +236,7 @@ async function runPrettier(
         // come from the package.json or skill configuration.
         const cmd = params.project.path("node_modules", ".bin", "prettier");
         const captureLog = childProcess.captureLog();
-        const result = await params.project.spawn(cmd, args, { log: captureLog });
+        const result = await params.project.spawn(cmd, args, { log: captureLog, logCommand: false });
         return {
             exitCode: result.status,
             log: captureLog.log.trim(),
@@ -254,6 +254,7 @@ async function runPrettier(
             [...modules.map(m => `--package=${m}`), "--quiet", "prettier", ...args],
             {
                 log: captureLog,
+                logCommand: false,
             },
         );
         return {
