@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 
-import { EventContext, EventHandler, git, github, project, repository, runSteps, secret, Step } from "@atomist/skill";
+import {
+    EventContext,
+    EventHandler,
+    git,
+    github,
+    project,
+    repository,
+    runSteps,
+    secret,
+    Step,
+    status,
+} from "@atomist/skill";
 import { Severity } from "@atomist/skill-logging";
 import * as fs from "fs-extra";
 import { DefaultLintConfiguration, LintConfiguration } from "../configuration";
@@ -36,11 +47,7 @@ const SetupStep: LintStep = {
         const repo = push.repo;
 
         if (push.branch.startsWith("prettier-")) {
-            return {
-                code: 1,
-                reason: "Don't lint an prettier branch",
-                visibility: "hidden",
-            };
+            return status.failure("Don't lint an prettier branch").hidden();
         }
 
         await ctx.audit.log(`Starting Prettier on ${repo.owner}/${repo.name}`);
@@ -70,23 +77,17 @@ const SetupStep: LintStep = {
             ignore: [".git", "node_modules"],
         });
         if (matchingFiles.length === 0) {
-            return {
-                code: 1,
-                reason: "Project does not contain any matching files",
-                visibility: "hidden",
-            };
+            return status.failure("Project does not contain any matching files").hidden();
         }
 
-        params.check = await github.openCheck(ctx, params.project.id, {
+        params.check = await github.createCheck(ctx, params.project.id, {
             sha: push.after.sha,
             name: "prettier-skill",
             title: "Prettier",
             body: `Running \`prettier\``,
         });
 
-        return {
-            code: 0,
-        };
+        return status.success();
     },
 };
 
@@ -110,9 +111,7 @@ const NpmInstallStep: LintStep = {
             await params.project.spawn("git", ["reset", "--hard"], opts);
         }
 
-        return {
-            code: 0,
-        };
+        return status.success();
     },
 };
 
@@ -126,16 +125,9 @@ const ValidateRepositoryStep: LintStep = {
         const repo = push.repo;
 
         if (!(await fs.pathExists(params.project.path("node_modules", ".bin", "prettier")))) {
-            return {
-                code: 1,
-                visibility: "hidden",
-                reason: `No Prettier installed in [${repo.owner}/${repo.name}](${repo.url})`,
-            };
-        } else {
-            return {
-                code: 0,
-            };
+            return status.failure(`No Prettier installed in [${repo.owner}/${repo.name}](${repo.url})`);
         }
+        return status.success();
     },
 };
 
@@ -190,32 +182,28 @@ const RunEslintStep: LintStep = {
         if (result.exitCode === 0) {
             await params.check.update({
                 conclusion: "success",
-                body: `\`prettier\` found code to be formatted properly.
+                body: `\`prettier\` found code to be formatted properly
 
 \`$ prettier ${argsString}\``,
             });
-            return {
-                code: 0,
-                reason: `Prettier found [${repo.owner}/${repo.name}](${repo.url}) to be formatted properly`,
-            };
+            return status.success(`Prettier found [${repo.owner}/${repo.name}](${repo.url}) to be formatted properly`);
         } else if (result.exitCode === 1) {
             await params.check.update({
                 conclusion: "action_required",
-                body: `\`prettier\` found code not to be formatted properly.
+                body: `\`prettier\` found code not to be formatted properly
 
 \`$ prettier ${argsString}\``,
             });
 
-            return {
-                code: 0,
-                reason: `Prettier found [${repo.owner}/${repo.name}](${repo.url}) not to be formatted properly`,
-            };
+            return status.success(
+                `Prettier found [${repo.owner}/${repo.name}](${repo.url}) not to be formatted properly`,
+            );
         } else if (result.exitCode === 2) {
-            await ctx.audit.log(`Running Prettier failed with configuration or internal error:`, Severity.ERROR);
+            await ctx.audit.log(`Running Prettier errored:`, Severity.ERROR);
             await ctx.audit.log(result.log, Severity.ERROR);
             await params.check.update({
                 conclusion: "action_required",
-                body: `Running \`prettier\` failed with a configuration error.
+                body: `Running \`prettier\` errored
 
 \`$ prettier ${argsString}\`
 
@@ -223,20 +211,13 @@ const RunEslintStep: LintStep = {
 ${result.log}
 \`\`\``,
             });
-            return {
-                code: 1,
-                reason: `Running Prettier failed with a configuration error`,
-            };
+            return status.failure(`Running Prettier errored`);
         } else {
             await params.check.update({
                 conclusion: "action_required",
                 body: `Unknown Prettier exit code: \`${result.exitCode}\``,
             });
-            return {
-                code: 1,
-                visibility: "hidden",
-                reason: `Unknown Prettier exit code`,
-            };
+            return status.failure(`Unknown Prettier exit code`).hidden();
         }
     },
 };
@@ -336,9 +317,7 @@ const ClosePrStep: LintStep = {
             `prettier-${push.branch}`,
             "Closing pull request because code has been properly formatted in base branch",
         );
-        return {
-            code: 0,
-        };
+        return status.success();
     },
 };
 
