@@ -47,8 +47,8 @@ const SetupStep: LintStep = {
         const push = ctx.data.Push[0];
         const repo = push.repo;
 
-        if (push.branch.startsWith("prettier-")) {
-            return status.failure("Don't lint an prettier branch").hidden();
+        if (push.branch.startsWith("atomist/")) {
+            return status.failure(`Ignore generated branch`).hidden();
         }
 
         await ctx.audit.log(`Starting Prettier on ${repo.owner}/${repo.name}`);
@@ -293,7 +293,7 @@ const PushStep: LintStep = {
                 },
             },
             {
-                branch: `prettier-${push.branch}`,
+                branch: `atomist/prettier-${push.branch}`,
                 title: "Prettier fixes",
                 body: "Prettier format fixes",
                 labels: cfg.labels,
@@ -316,7 +316,7 @@ const ClosePrStep: LintStep = {
             ctx,
             params.project,
             push.branch,
-            `prettier-${push.branch}`,
+            `atomist/prettier-${push.branch}`,
             "Closing pull request because code has been properly formatted in base branch",
         );
         return status.success();
