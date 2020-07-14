@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist-skills/prettier-skill/compare/0.1.0...HEAD)
 
+### Changed
+
+-   Ignore generated branches. [c9cc527](https://github.com/atomist-skills/prettier-skill/commit/c9cc527ee9958b942c976567b623d1125bc95b25)
+
 ### Fixed
 
 -   Fix extra line breaks in prettier output. [7eb410c](https://github.com/atomist-skills/prettier-skill/commit/7eb410c21cf185d46b249a0ea8b97c82322c4e07)
