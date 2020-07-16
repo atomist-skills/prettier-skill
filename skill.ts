@@ -106,6 +106,27 @@ export const Skill = skill<LintConfiguration & { repos: any }>({
                 "Add additional labels to pull requests raised by this skill, e.g. to configure the [auto-merge](https://go.atomist.com/catalog/skills/atomist/github-auto-merge-skill) behavior.",
             required: false,
         },
+        configure: {
+            type: ParameterType.SingleChoice,
+            displayName: "Configure repositories",
+            description: "Update repositories to use the skill's prettier configuration",
+            options: [
+                {
+                    text: "Update prettier config and ignore files",
+                    value: "prettier_only",
+                },
+                {
+                    text: "Update prettier config, ignore files and install Git commit hooks",
+                    value: "prettier_and_hook",
+                },
+                {
+                    text: "Don't configure prettier",
+                    value: "none",
+                },
+            ],
+            defaultValue: "none",
+            required: false,
+        },
         repos: parameter.repoFilter(),
     },
 

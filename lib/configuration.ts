@@ -25,6 +25,7 @@ export interface LintConfiguration {
     modules?: string[];
     push?: "none" & parameter.PushStrategy;
     labels?: string[];
+    configure?: "prettier_only" | "prettier_and_hook";
 }
 
 export const DefaultLintConfiguration: LintConfiguration = {
