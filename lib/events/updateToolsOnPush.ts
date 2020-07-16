@@ -133,6 +133,10 @@ const ConfigureHooksStep: UpdateStep = {
         const pj = await fs.readJson(params.project.path("package.json"));
         const opts = { env: { ...process.env, NODE_ENV: "development" } };
 
+        // Install prettier
+        if (!pj.devDependencies?.prettier) {
+            await params.project.spawn("npm", ["install", "prettier", "--save-dev"], opts);
+        }
         // Install husky
         if (!pj.devDependencies?.husky) {
             await params.project.spawn("npm", ["install", "husky", "--save-dev"], opts);
