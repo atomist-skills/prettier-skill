@@ -130,8 +130,9 @@ const ConfigureHooksStep: UpdateStep = {
     },
     run: async (ctx, params) => {
         const cfg = ctx.configuration[0].parameters;
-        const pj = await fs.readJson(params.project.path("package.json"));
         const opts = { env: { ...process.env, NODE_ENV: "development" } };
+
+        let pj = await fs.readJson(params.project.path("package.json"));
 
         // Install prettier
         if (!pj.devDependencies?.prettier) {
@@ -145,6 +146,8 @@ const ConfigureHooksStep: UpdateStep = {
         if (!pj.devDependencies?.["lint-staged"]) {
             await params.project.spawn("npm", ["install", "lint-staged", "--save-dev"], opts);
         }
+
+        pj = await fs.readJson(params.project.path("package.json"));
 
         // Add npm script to run prettier
         const script = `atm:lint:prettier`;
