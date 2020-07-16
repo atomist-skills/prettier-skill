@@ -107,7 +107,7 @@ const NpmInstallStep: LintStep = {
 
         const cfg = ctx.configuration[0].parameters;
         if (cfg.modules?.length > 0) {
-            await ctx.audit.log("Installing configured NPM packages");
+            await ctx.audit.log("Installing configured npm packages");
             await params.project.spawn("npm", ["install", ...cfg.modules, ...NpmDevInstallArgs], opts);
             await params.project.spawn("git", ["reset", "--hard"], opts);
         }

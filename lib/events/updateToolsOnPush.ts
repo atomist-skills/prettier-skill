@@ -52,7 +52,7 @@ const SetupStep: UpdateStep = {
             return status.failure(`No configuration updates requested`).hidden();
         }
 
-        await ctx.audit.log(`Updating prettier configuration on ${repo.owner}/${repo.name}`);
+        await ctx.audit.log(`Updating Prettier configuration on ${repo.owner}/${repo.name}`);
 
         params.credential = await ctx.credential.resolve(
             secret.gitHubAppToken({
@@ -91,7 +91,7 @@ const NpmInstallStep: UpdateStep = {
         const opts = { env: { ...process.env, NODE_ENV: "development" } };
 
         const cfg = ctx.configuration[0].parameters;
-        await ctx.audit.log("Installing configured NPM packages");
+        await ctx.audit.log("Installing configured npm packages");
         await params.project.spawn("npm", ["install", ...cfg.modules, ...NpmDevInstallArgs], opts);
 
         return status.success();
@@ -201,6 +201,18 @@ const PushStep: UpdateStep = {
         const push = ctx.data.Push[0];
         const repo = push.repo;
 
+        let body = `Update Prettier repository configuration to [skill configuration](https://go.atomist.com/${
+            ctx.workspaceId
+        }/manage/skills/configure/${ctx.skill.id}/${encodeURIComponent(ctx.configuration[0].name)}).`;
+
+        if (ctx.configuration?.[0]?.parameters?.configure === "prettier_and_hook") {
+            body = `${body}
+
+This pull request configures support for applying Prettier formatting rules on every commit locally by using a Git pre-commit hook. The pre-commit hook will only format staged files. To apply the formatting rules across your entire repository, run: 
+
+\`$ npm run atm:lint:prettier --- '${cfg.glob}'\``;
+        }
+
         return github.persistChanges(
             ctx,
             params.project,
@@ -216,14 +228,12 @@ const PushStep: UpdateStep = {
             },
             {
                 branch: `atomist/prettier-config-${push.branch}`,
-                title: "Update prettier configuration",
-                body: `Update prettier repository configuration to [skill configuration](https://go.atomist.com/${
-                    ctx.workspaceId
-                }/manage/skills/configure/${ctx.skill.id}/${encodeURIComponent(ctx.configuration[0].name)})`,
+                title: "Update Prettier configuration",
+                body,
                 labels: cfg.labels,
             },
             {
-                message: `Update prettier repository configuration\n\n[atomist:generated]\n[atomist-skill:atomist/prettier-skill]`,
+                message: `Update Prettier repository configuration\n\n[atomist:generated]\n[atomist-skill:atomist/prettier-skill]`,
             },
         );
     },
