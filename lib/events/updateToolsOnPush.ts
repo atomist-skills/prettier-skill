@@ -156,12 +156,10 @@ const ConfigureHooksStep: UpdateStep = {
         _.set(pj, `scripts.${script}`, `prettier ${_.uniq(args)}`);
 
         // Add husky configuration
-        if (!pj.husky?.["pre-commit"]) {
-            pj.husky = {
-                "pre-commit": "lint-staged",
-            };
-        } else if (!pj.husky["pre-commit"].includes("lint-staged")) {
-            pj.husky["pre-commit"] = `${pj.husky["pre-commit"]} && lint-staged`;
+        if (!pj.husky?.["hooks"]?.["pre-commit"]) {
+            _.set(pj, "husky.hooks.pre-commit", "lint-staged");
+        } else if (!pj.husky.hooks["pre-commit"].includes("lint-staged")) {
+            pj.husky.hooks["pre-commit"] = `${pj.husky["pre-commit"]} && lint-staged`;
         }
 
         // Add lint-staged configuration
