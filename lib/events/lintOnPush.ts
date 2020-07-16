@@ -29,7 +29,7 @@ import {
 } from "@atomist/skill";
 import { Severity } from "@atomist/skill-logging";
 import * as fs from "fs-extra";
-import { DefaultLintConfiguration, LintConfiguration } from "../configuration";
+import { DefaultLintConfiguration, LintConfiguration, NpmDevInstallArgs, NpmInstallArgs } from "../configuration";
 import { LintOnPushSubscription } from "../typings/types";
 
 interface LintParameters {
@@ -100,15 +100,15 @@ const NpmInstallStep: LintStep = {
     run: async (ctx, params) => {
         const opts = { env: { ...process.env, NODE_ENV: "development" } };
         if (await fs.pathExists(params.project.path("package-lock.json"))) {
-            await params.project.spawn("npm", ["ci"], opts);
+            await params.project.spawn("npm", ["ci", ...NpmInstallArgs], opts);
         } else {
-            await params.project.spawn("npm", ["install"], opts);
+            await params.project.spawn("npm", ["install", ...NpmInstallArgs], opts);
         }
 
         const cfg = ctx.configuration[0].parameters;
         if (cfg.modules?.length > 0) {
             await ctx.audit.log("Installing configured NPM packages");
-            await params.project.spawn("npm", ["install", ...cfg.modules, "--save-dev"], opts);
+            await params.project.spawn("npm", ["install", ...cfg.modules, ...NpmDevInstallArgs], opts);
             await params.project.spawn("git", ["reset", "--hard"], opts);
         }
 

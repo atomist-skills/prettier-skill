@@ -16,6 +16,9 @@
 
 import { parameter } from "@atomist/skill";
 
+export const NpmInstallArgs = ["--ignore-scripts", "--no-audit", "--no-fund"];
+export const NpmDevInstallArgs = ["--save-dev", ...NpmInstallArgs];
+
 export interface LintConfiguration {
     glob?: string;
     ignores?: string[];

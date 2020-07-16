@@ -27,7 +27,7 @@ import {
     Step,
 } from "@atomist/skill";
 import * as fs from "fs-extra";
-import { DefaultLintConfiguration, LintConfiguration } from "../configuration";
+import { DefaultLintConfiguration, LintConfiguration, NpmDevInstallArgs } from "../configuration";
 import { LintOnPushSubscription, UpdateToolsOnPushSubscription } from "../typings/types";
 import * as _ from "lodash";
 
@@ -92,7 +92,7 @@ const NpmInstallStep: UpdateStep = {
 
         const cfg = ctx.configuration[0].parameters;
         await ctx.audit.log("Installing configured NPM packages");
-        await params.project.spawn("npm", ["install", ...cfg.modules, "--save-dev"], opts);
+        await params.project.spawn("npm", ["install", ...cfg.modules, ...NpmDevInstallArgs], opts);
 
         return status.success();
     },
@@ -134,17 +134,18 @@ const ConfigureHooksStep: UpdateStep = {
 
         let pj = await fs.readJson(params.project.path("package.json"));
 
-        // Install prettier
+        const modules = [];
         if (!pj.devDependencies?.prettier) {
-            await params.project.spawn("npm", ["install", "prettier", "--save-dev"], opts);
+            modules.push("prettier");
         }
-        // Install husky
         if (!pj.devDependencies?.husky) {
-            await params.project.spawn("npm", ["install", "husky", "--save-dev"], opts);
+            modules.push("husky");
         }
-        // Install lint-staged
         if (!pj.devDependencies?.["lint-staged"]) {
-            await params.project.spawn("npm", ["install", "lint-staged", "--save-dev"], opts);
+            modules.push("lint-staged");
+        }
+        if (modules.length > 0) {
+            await params.project.spawn("npm", ["install", ...modules, ...NpmDevInstallArgs], opts);
         }
 
         pj = await fs.readJson(params.project.path("package.json"));
@@ -216,11 +217,13 @@ const PushStep: UpdateStep = {
             {
                 branch: `atomist/prettier-config-${push.branch}`,
                 title: "Update prettier configuration",
-                body: "Update project's prettier configuration to skill configuration",
+                body: `Update prettier repository configuration to [skill configuration](https://go.atomist.com/${
+                    ctx.workspaceId
+                }/manage/skills/configure/${ctx.skill.id}/${encodeURIComponent(ctx.configuration[0].name)})`,
                 labels: cfg.labels,
             },
             {
-                message: `Update prettier project configuration\n\n[atomist:generated]\n[atomist-skill:atomist/prettier-skill]`,
+                message: `Update prettier repository configuration\n\n[atomist:generated]\n[atomist-skill:atomist/prettier-skill]`,
             },
         );
     },
