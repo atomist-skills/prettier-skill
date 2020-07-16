@@ -151,7 +151,7 @@ const RunEslintStep: LintStep = {
 
         // Add .prettierignore if missing
         if (!(await fs.pathExists(params.project.path(".prettierignore"))) && !!cfg.ignores) {
-            await fs.writeFile(ignoreFile, cfg.ignores.join("\n"));
+            await fs.writeFile(ignoreFile, `${cfg.ignores.join("\n")}\n`);
             filesToDelete.push(ignoreFile);
             args.push("--ignore-path", ignoreFile);
         }

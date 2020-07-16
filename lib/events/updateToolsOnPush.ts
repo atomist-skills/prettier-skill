@@ -111,7 +111,7 @@ const ConfigureEslintStep: UpdateStep = {
 
         // Add .prettierignore
         if (cfg.ignores) {
-            await fs.writeFile(ignoreFile, cfg.ignores.join("\n"));
+            await fs.writeFile(ignoreFile, `${cfg.ignores.join("\n")}\n`);
         }
 
         // Add .prettierrc.json
