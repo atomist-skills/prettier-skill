@@ -151,6 +151,7 @@ const ConfigureHooksStep: UpdateStep = {
 
         // Add npm script to run prettier
         const script = `atm:lint:prettier`;
+
         const args = ["--write"];
         cfg.args?.forEach(a => args.push(a));
         _.set(pj, `scripts.${script}`, `prettier ${_.uniq(args)}`);
