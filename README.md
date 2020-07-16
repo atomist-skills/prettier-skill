@@ -22,7 +22,7 @@ many supported file formats.
 -   Also supports repository-specific Prettier configurations
 -   Uses GitHub Checks to signal formatting issues
 -   Optionally get commits or pull requests with fixes
--   Optionally configures projects to run Prettier locally 
+-   Optionally configures projects to run Prettier locally
 
 # Before you get started
 
