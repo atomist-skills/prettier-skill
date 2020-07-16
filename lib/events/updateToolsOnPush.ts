@@ -48,6 +48,10 @@ const SetupStep: UpdateStep = {
             return status.failure(`Ignore push to non-default branch`).hidden();
         }
 
+        if (ctx.configuration?.[0]?.parameters?.configure === "none") {
+            return status.failure(`No configuration updates requested`).hidden();
+        }
+
         await ctx.audit.log(`Updating prettier configuration on ${repo.owner}/${repo.name}`);
 
         params.credential = await ctx.credential.resolve(
