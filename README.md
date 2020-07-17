@@ -105,21 +105,21 @@ integration is optional.
     [Auto-Merge Pull Requests](https://go.atomist.com/catalog/skills/atomist/github-auto-merge-skill)
     skill.
 
-1. **Add prettier configuration to repositories for local use**
+1. **Add Prettier configuration to repositories for local use**
 
-    Choose one of these options to add the prettier configuration to your repositories, and optionally
+    Choose one of these options to add the Prettier configuration to your repositories, and optionally
     enable [Git hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) to get support for
     running prettier locally with the same configuration.
 
-    If you choose to install the Git commit hooks, prettier will be run on each local commit you make.
+    If you choose to install the Git commit hooks, Prettier will be run on each local commit you make.
 
-    By default, the prettier configuration will not be added to your repositories. Select one of these
+    By default, the Prettier configuration will not be added to your repositories. Select one of these
     options to change the behavior:
 
-    - **Update prettier config, ignore files and install Git commit hooks** - the prettier configuration
-      will be added to the repository, ignore files updated to ignore the prettier configuration added,
+    - **Update Prettier config, ignore files and install Git commit hooks** - the Prettier configuration
+      will be added to the repository, ignore files updated to ignore the Prettier configuration added,
       and the Git commit hook will be installed
-    - **Update prettier config and ignore files** - the same behavior as above, without installing the
+    - **Update Prettier config and ignore files** - the same behavior as above, without installing the
       Git commit hook
 
 1. **Determine repository scope**
