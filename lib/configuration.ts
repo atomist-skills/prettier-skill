@@ -20,18 +20,18 @@ export const NpmInstallArgs = ["--ignore-scripts", "--no-audit", "--no-fund"];
 export const NpmDevInstallArgs = ["--save-dev", ...NpmInstallArgs];
 
 export interface LintConfiguration {
-    glob?: string;
-    ignores?: string[];
-    config?: string;
-    commitMsg?: string;
-    args?: string[];
-    modules?: string[];
-    push?: "none" & parameter.PushStrategy;
-    labels?: string[];
-    configure?: "prettier_only" | "prettier_and_hook" | "none";
+	glob?: string;
+	ignores?: string[];
+	config?: string;
+	commitMsg?: string;
+	args?: string[];
+	modules?: string[];
+	push?: "none" & parameter.PushStrategy;
+	labels?: string[];
+	configure?: "prettier_only" | "prettier_and_hook" | "none";
 }
 
 export const DefaultLintConfiguration: LintConfiguration = {
-    glob: ".",
-    commitMsg: `Prettier format fixes\n\n[atomist:generated]\n[atomist-skill:atomist/prettier-skill]`,
+	glob: ".",
+	commitMsg: `Prettier format fixes\n\n[atomist:generated]\n[atomist-skill:atomist/prettier-skill]`,
 };
