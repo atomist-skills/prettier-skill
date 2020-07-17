@@ -119,7 +119,11 @@ const ConfigureEslintStep: UpdateStep = {
             await fs.writeFile(configFile, cfg.config);
         }
 
-        return status.success();
+        if ((await git.status(params.project)).isClean) {
+            return status.success(`No configuration updates in [${repo.owner}/${repo.name}](${repo.url})`);
+        } else {
+            return status.success(`Updated configuration in [${repo.owner}/${repo.name}](${repo.url})`);
+        }
     },
 };
 
@@ -183,7 +187,11 @@ const ConfigureHooksStep: UpdateStep = {
             spaces: 2,
         });
 
-        return status.success();
+        if ((await git.status(params.project)).isClean) {
+            return status.success(`No configuration updates in [${repo.owner}/${repo.name}](${repo.url})`);
+        } else {
+            return status.success(`Updated configuration in [${repo.owner}/${repo.name}](${repo.url})`);
+        }
     },
 };
 

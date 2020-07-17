@@ -48,7 +48,7 @@ const SetupStep: LintStep = {
         const repo = push.repo;
 
         if (push.branch.startsWith("atomist/")) {
-            return status.failure(`Ignore generated branch`).hidden();
+            return status.success(`Ignore generated branch`).hidden().abort();
         }
 
         await ctx.audit.log(`Starting Prettier on ${repo.owner}/${repo.name}`);
@@ -78,7 +78,7 @@ const SetupStep: LintStep = {
             ignore: [".git", "node_modules"],
         });
         if (matchingFiles.length === 0) {
-            return status.failure("Project does not contain any matching files").hidden();
+            return status.success("Project does not contain any matching files").hidden().abort();
         }
 
         params.check = await github.createCheck(ctx, params.project.id, {
@@ -200,8 +200,8 @@ const RunEslintStep: LintStep = {
                 `Prettier found [${repo.owner}/${repo.name}](${repo.url}) not to be formatted properly`,
             );
         } else if (result.exitCode === 2) {
-            await ctx.audit.log(`Running Prettier errored:`, Severity.ERROR);
-            await ctx.audit.log(result.log, Severity.ERROR);
+            await ctx.audit.log(`Running Prettier errored:`, Severity.Error);
+            await ctx.audit.log(result.log, Severity.Error);
             await params.check.update({
                 conclusion: "action_required",
                 body: `Running \`prettier\` errored
