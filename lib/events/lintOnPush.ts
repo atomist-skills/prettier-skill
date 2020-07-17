@@ -377,8 +377,8 @@ const ClosePrStep: LintStep = {
 export const handler: EventHandler<
 	LintOnPushSubscription,
 	LintConfiguration
-> = async ctx => {
-	return runSteps({
+> = async ctx =>
+	runSteps({
 		context: ctx,
 		steps: [
 			SetupStep,
@@ -389,4 +389,3 @@ export const handler: EventHandler<
 			PushStep,
 		],
 	});
-};
