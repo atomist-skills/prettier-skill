@@ -100,7 +100,7 @@ const SetupStep: UpdateStep = {
 
 const NpmInstallStep: UpdateStep = {
 	name: "npm install",
-	runWhen: async (ctx, params) => {
+	runWhen: async ctx => {
 		return ctx.configuration?.[0]?.parameters?.modules?.length > 0;
 	},
 	run: async (ctx, params) => {
@@ -121,6 +121,8 @@ const NpmInstallStep: UpdateStep = {
 const ConfigureEslintStep: UpdateStep = {
 	name: "configure prettier",
 	run: async (ctx, params) => {
+		const push = ctx.data.Push[0];
+		const repo = push.repo;
 		const cfg: LintConfiguration = {
 			...DefaultLintConfiguration,
 			...ctx.configuration[0].parameters,
@@ -153,12 +155,14 @@ const ConfigureEslintStep: UpdateStep = {
 
 const ConfigureHooksStep: UpdateStep = {
 	name: "configure hooks",
-	runWhen: async (ctx, params) => {
+	runWhen: async ctx => {
 		return (
 			ctx.configuration?.[0]?.parameters?.configure === "prettier_and_hook"
 		);
 	},
 	run: async (ctx, params) => {
+		const push = ctx.data.Push[0];
+		const repo = push.repo;
 		const cfg = ctx.configuration[0].parameters;
 		const opts = { env: { ...process.env, NODE_ENV: "development" } };
 
