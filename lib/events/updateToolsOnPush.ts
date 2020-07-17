@@ -169,7 +169,7 @@ const ConfigureHooksStep: UpdateStep = {
         if (pj["lint-staged"]) {
             // First attempt to delete the previous glob
             for (const g in pj["lint-staged"]) {
-                if (pj["lint-staged"][g] === `npm run ${script}`) {
+                if (pj["lint-staged"][g] === `npm run ${script}` && g !== glob) {
                     delete pj["lint-staged"][g];
                 }
             }
