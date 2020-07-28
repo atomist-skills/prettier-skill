@@ -59,7 +59,9 @@ const SetupStep: UpdateStep = {
 		}
 
 		if (ctx.configuration?.[0]?.parameters?.configure === "none") {
-			return status.failure(`No configuration updates requested`).hidden();
+			return status
+				.failure(`No configuration updates requested`)
+				.hidden();
 		}
 
 		await ctx.audit.log(
@@ -157,7 +159,8 @@ const ConfigureHooksStep: UpdateStep = {
 	name: "configure hooks",
 	runWhen: async ctx => {
 		return (
-			ctx.configuration?.[0]?.parameters?.configure === "prettier_and_hook"
+			ctx.configuration?.[0]?.parameters?.configure ===
+			"prettier_and_hook"
 		);
 	},
 	run: async (ctx, params) => {
@@ -199,7 +202,9 @@ const ConfigureHooksStep: UpdateStep = {
 		if (!pj.husky?.["hooks"]?.["pre-commit"]) {
 			_.set(pj, "husky.hooks.pre-commit", "lint-staged");
 		} else if (!pj.husky.hooks["pre-commit"].includes("lint-staged")) {
-			pj.husky.hooks["pre-commit"] = `${pj.husky["pre-commit"]} && lint-staged`;
+			pj.husky.hooks[
+				"pre-commit"
+			] = `${pj.husky["pre-commit"]} && lint-staged`;
 		}
 
 		// Add lint-staged configuration
@@ -207,7 +212,10 @@ const ConfigureHooksStep: UpdateStep = {
 		if (pj["lint-staged"]) {
 			// First attempt to delete the previous glob
 			for (const g in pj["lint-staged"]) {
-				if (pj["lint-staged"][g] === `npm run ${script}` && g !== glob) {
+				if (
+					pj["lint-staged"][g] === `npm run ${script}` &&
+					g !== glob
+				) {
 					delete pj["lint-staged"][g];
 				}
 			}
@@ -257,7 +265,10 @@ const PushStep: UpdateStep = {
 			ctx.configuration[0].name,
 		)}).`;
 
-		if (ctx.configuration?.[0]?.parameters?.configure === "prettier_and_hook") {
+		if (
+			ctx.configuration?.[0]?.parameters?.configure ===
+			"prettier_and_hook"
+		) {
 			body = `${body}
 
 This pull request configures support for applying Prettier formatting rules on every commit locally by using a Git pre-commit hook. The pre-commit hook will only format staged files. To apply the formatting rules across your entire repository, run: 

@@ -121,7 +121,11 @@ const NpmInstallStep: LintStep = {
 		if (await fs.pathExists(params.project.path("package-lock.json"))) {
 			await params.project.spawn("npm", ["ci", ...NpmInstallArgs], opts);
 		} else {
-			await params.project.spawn("npm", ["install", ...NpmInstallArgs], opts);
+			await params.project.spawn(
+				"npm",
+				["install", ...NpmInstallArgs],
+				opts,
+			);
 		}
 
 		const cfg = ctx.configuration[0].parameters;
@@ -298,7 +302,12 @@ async function runPrettier(
 		const captureLog = childProcess.captureLog();
 		const result = await params.project.spawn(
 			"npx",
-			[...modules.map(m => `--package=${m}`), "--quiet", "prettier", ...args],
+			[
+				...modules.map(m => `--package=${m}`),
+				"--quiet",
+				"prettier",
+				...args,
+			],
 			{
 				log: captureLog,
 				logCommand: false,

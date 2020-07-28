@@ -50,13 +50,15 @@ export const Skill = skill<LintConfiguration & { repos: any }>({
 		glob: {
 			type: ParameterType.String,
 			displayName: "Files",
-			description: "File, folder or glob pattern to format (defaults to '.')",
+			description:
+				"File, folder or glob pattern to format (defaults to '.')",
 			required: false,
 		},
 		ignores: {
 			type: ParameterType.StringArray,
 			displayName: "Ignore pattern",
-			description: "Pattern of files or folders to ignore during formatting",
+			description:
+				"Pattern of files or folders to ignore during formatting",
 			required: false,
 		},
 		config: {
