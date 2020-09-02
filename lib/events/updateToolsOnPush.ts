@@ -172,13 +172,16 @@ const ConfigureHooksStep: UpdateStep = {
 		let pj = await fs.readJson(params.project.path("package.json"));
 
 		const modules = [];
-		if (!pj.devDependencies?.prettier) {
+		if (!pj.devDependencies?.prettier && !pj.dependencies?.prettier) {
 			modules.push("prettier");
 		}
-		if (!pj.devDependencies?.husky) {
+		if (!pj.devDependencies?.husky && !pj.dependencies?.husky) {
 			modules.push("husky");
 		}
-		if (!pj.devDependencies?.["lint-staged"]) {
+		if (
+			!pj.devDependencies?.["lint-staged"] &&
+			!pj.dependencies?.["lint-staged"]
+		) {
 			modules.push("lint-staged");
 		}
 		if (modules.length > 0) {
