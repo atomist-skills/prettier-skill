@@ -111,7 +111,9 @@ const NpmInstallStep: UpdateStep = {
 		const cfg = ctx.configuration[0].parameters;
 		const pj = await fs.readJson(params.project.path("package.json"));
 		const modules = cfg.modules.filter(
-			m => !pj.dependencies?.[m] && !pj.devDependencies?.[m],
+			m =>
+				!pj.dependencies?.[moduleName(m)] &&
+				!pj.devDependencies?.[moduleName(m)],
 		);
 		if (modules.length > 0) {
 			await ctx.audit.log("Installing configured npm packages");
@@ -344,3 +346,12 @@ export const handler: EventHandler<
 			PushStep,
 		],
 	});
+
+export function moduleName(module: string): string {
+	const ix = module.lastIndexOf("@");
+	if (ix > 0) {
+		return module.slice(0, ix);
+	} else {
+		return module;
+	}
+}
