@@ -109,12 +109,18 @@ const NpmInstallStep: UpdateStep = {
 		const opts = { env: { ...process.env, NODE_ENV: "development" } };
 
 		const cfg = ctx.configuration[0].parameters;
-		await ctx.audit.log("Installing configured npm packages");
-		await params.project.spawn(
-			"npm",
-			["install", ...cfg.modules, ...NpmDevInstallArgs],
-			opts,
+		const pj = await fs.readJson(params.project.path("package.json"));
+		const modules = cfg.modules.filter(
+			m => !pj.dependencies?.[m] && !pj.devDependencies?.[m],
 		);
+		if (modules.length > 0) {
+			await ctx.audit.log("Installing configured npm packages");
+			await params.project.spawn(
+				"npm",
+				["install", ...modules, ...NpmDevInstallArgs],
+				opts,
+			);
+		}
 
 		return status.success();
 	},
