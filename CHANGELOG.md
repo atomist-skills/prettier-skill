@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist-skills/prettier-skill/compare/0.1.4...HEAD)
 
+### Fixed
+
+-   Always set commit check status. [#58](https://github.com/atomist-skills/prettier-skill/issues/58)
+
 ## [0.1.4](https://github.com/atomist-skills/prettier-skill/compare/0.1.3...0.1.4) - 2020-07-28
 
 ### Changed
