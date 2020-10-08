@@ -58,7 +58,7 @@ const SetupStep: UpdateStep = {
 			return status.failure(`Ignore push to non-default branch`).hidden();
 		}
 
-		if (ctx.configuration?.[0]?.parameters?.configure === "none") {
+		if (ctx.configuration?.parameters?.configure === "none") {
 			return status
 				.failure(`No configuration updates requested`)
 				.hidden();
@@ -103,12 +103,12 @@ const SetupStep: UpdateStep = {
 const NpmInstallStep: UpdateStep = {
 	name: "npm install",
 	runWhen: async ctx => {
-		return ctx.configuration?.[0]?.parameters?.modules?.length > 0;
+		return ctx.configuration?.parameters?.modules?.length > 0;
 	},
 	run: async (ctx, params) => {
 		const opts = { env: { ...process.env, NODE_ENV: "development" } };
 
-		const cfg = ctx.configuration[0].parameters;
+		const cfg = ctx.configuration?.parameters;
 		const pj = await fs.readJson(params.project.path("package.json"));
 		const modules = cfg.modules.filter(
 			m =>
@@ -135,7 +135,7 @@ const ConfigureEslintStep: UpdateStep = {
 		const repo = push.repo;
 		const cfg: LintConfiguration = {
 			...DefaultLintConfiguration,
-			...ctx.configuration[0].parameters,
+			...(ctx.configuration?.parameters || {}),
 		};
 
 		const configFile = params.project.path(`.prettierrc.json`);
@@ -166,15 +166,12 @@ const ConfigureEslintStep: UpdateStep = {
 const ConfigureHooksStep: UpdateStep = {
 	name: "configure hooks",
 	runWhen: async ctx => {
-		return (
-			ctx.configuration?.[0]?.parameters?.configure ===
-			"prettier_and_hook"
-		);
+		return ctx.configuration?.parameters?.configure === "prettier_and_hook";
 	},
 	run: async (ctx, params) => {
 		const push = ctx.data.Push[0];
 		const repo = push.repo;
-		const cfg = ctx.configuration[0].parameters;
+		const cfg = ctx.configuration?.parameters;
 		const opts = { env: { ...process.env, NODE_ENV: "development" } };
 
 		let pj = await fs.readJson(params.project.path("package.json"));
@@ -255,7 +252,7 @@ const ConfigureHooksStep: UpdateStep = {
 const PushStep: UpdateStep = {
 	name: "push",
 	runWhen: async (ctx, params) => {
-		const pushCfg = ctx.configuration[0]?.parameters?.push;
+		const pushCfg = ctx.configuration?.parameters?.push;
 		return (
 			!!pushCfg &&
 			pushCfg !== "none" &&
@@ -265,7 +262,7 @@ const PushStep: UpdateStep = {
 	run: async (ctx, params) => {
 		const cfg: LintConfiguration = {
 			...DefaultLintConfiguration,
-			...ctx.configuration[0].parameters,
+			...(ctx.configuration?.parameters || {}),
 		};
 		const push = ctx.data.Push[0];
 		const repo = push.repo;
@@ -273,13 +270,10 @@ const PushStep: UpdateStep = {
 		let body = `Update Prettier repository configuration to [skill configuration](https://go.atomist.com/${
 			ctx.workspaceId
 		}/manage/skills/configure/${ctx.skill.id}/${encodeURIComponent(
-			ctx.configuration[0].name,
+			ctx.configuration?.name,
 		)}).`;
 
-		if (
-			ctx.configuration?.[0]?.parameters?.configure ===
-			"prettier_and_hook"
-		) {
+		if (ctx.configuration?.parameters?.configure === "prettier_and_hook") {
 			body = `${body}
 
 This pull request configures support for applying Prettier formatting rules on every commit locally by using a Git pre-commit hook. The pre-commit hook will only format staged files. To apply the formatting rules across your entire repository, run: 

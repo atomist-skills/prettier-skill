@@ -85,7 +85,7 @@ const SetupStep: LintStep = {
 			} at sha ${push.after.sha.slice(0, 7)}`,
 		);
 
-		const includeGlobs = ctx.configuration?.[0]?.parameters?.glob || ".";
+		const includeGlobs = ctx.configuration?.parameters?.glob || ".";
 		const matchingFiles = await project.globFiles(
 			params.project,
 			includeGlobs,
@@ -128,7 +128,7 @@ const NpmInstallStep: LintStep = {
 			);
 		}
 
-		const cfg = ctx.configuration[0].parameters;
+		const cfg = ctx.configuration?.parameters;
 		if (cfg.modules?.length > 0) {
 			await ctx.audit.log("Installing configured npm packages");
 			await params.project.spawn(
@@ -172,7 +172,7 @@ const RunEslintStep: LintStep = {
 		const repo = push.repo;
 		const cfg: LintConfiguration = {
 			...DefaultLintConfiguration,
-			...ctx.configuration[0].parameters,
+			...(ctx.configuration?.parameters || {}),
 		};
 
 		const args: string[] = [];
@@ -292,7 +292,7 @@ async function runPrettier(
 	} else {
 		// If project does not have a package.json, we can still run prettier through npx
 		// by installing all modules as packages to npx and making sure that at least prettier gets installed
-		const modules = ctx.configuration?.[0]?.parameters?.modules || [];
+		const modules = ctx.configuration?.parameters?.modules || [];
 		if (
 			!modules.some(m => m === "prettier") &&
 			!modules.some(m => m.startsWith("prettier@"))
@@ -323,7 +323,7 @@ async function runPrettier(
 const PushStep: LintStep = {
 	name: "push",
 	runWhen: async (ctx, params) => {
-		const pushCfg = ctx.configuration[0]?.parameters?.push;
+		const pushCfg = ctx.configuration?.parameters?.push;
 		return (
 			!!pushCfg &&
 			pushCfg !== "none" &&
@@ -333,7 +333,7 @@ const PushStep: LintStep = {
 	run: async (ctx, params) => {
 		const cfg: LintConfiguration = {
 			...DefaultLintConfiguration,
-			...ctx.configuration[0].parameters,
+			...(ctx.configuration?.parameters || {}),
 		};
 		const pushCfg = cfg.push;
 		const push = ctx.data.Push[0];
