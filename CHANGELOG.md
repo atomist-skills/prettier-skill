@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 -   Always set commit check status. [#58](https://github.com/atomist-skills/prettier-skill/issues/58)
 -   Fix npm casing. [26eaabf](https://github.com/atomist-skills/prettier-skill/commit/26eaabfd54f1d03d875db7f3c115993651516a43)
+-   Check return value of project.spawn. [#59](https://github.com/atomist-skills/prettier-skill/issues/59)
 
 ## [0.1.4](https://github.com/atomist-skills/prettier-skill/compare/0.1.3...0.1.4) - 2020-07-28
 
