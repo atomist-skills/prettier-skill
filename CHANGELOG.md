@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist-skills/prettier-skill/compare/0.1.4...HEAD)
 
+### Added
+
+-   Preserve spacing in package.json when updating dependencies. [#72](https://github.com/atomist-skills/prettier-skill/issues/72)
+
 ### Fixed
 
 -   Always set commit check status. [#58](https://github.com/atomist-skills/prettier-skill/issues/58)
