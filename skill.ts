@@ -28,6 +28,7 @@ import { LintConfiguration } from "./lib/configuration";
 export const Skill = skill<LintConfiguration & { repos: any }>({
 	name: "prettier-skill",
 	namespace: "atomist",
+	description: "Run Prettier, the opinionated code formatter",
 	displayName: "Prettier",
 	author: "Atomist",
 	categories: [Category.CodeMaintenance],
