@@ -32,6 +32,8 @@ export const Skill = skill<LintConfiguration & { repos: any }>({
 	displayName: "Prettier",
 	author: "Atomist",
 	categories: [Category.CodeMaintenance],
+	iconUrl:
+		"https://raw.githubusercontent.com/atomist-skills/prettier-skill/main/docs/images/icon.svg",
 	license: "Apache-2.0",
 
 	runtime: {
