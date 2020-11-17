@@ -43,7 +43,6 @@ export const Skill = skill<LintConfiguration & { repos: any }>({
 
 	resourceProviders: {
 		github: resourceProvider.gitHub({ minRequired: 1 }),
-		chat: resourceProvider.chat({ minRequired: 0 }),
 	},
 
 	parameters: {
