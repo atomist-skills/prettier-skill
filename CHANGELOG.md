@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 -   Update skill icon. [de65f6b](https://github.com/atomist-skills/prettier-skill/commit/de65f6bf7a87268b4830dd40fe36e0303e1f9e5b)
+-   Use type generation in @atomist/skill. [4a4af2b](https://github.com/atomist-skills/prettier-skill/commit/4a4af2bde91a0edc09db73419467f1884f14c48e)
 
 ## [0.2.0](https://github.com/atomist-skills/prettier-skill/compare/0.1.5...0.2.0) - 2020-10-16
 
