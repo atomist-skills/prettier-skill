@@ -15,19 +15,19 @@
  */
 
 import {
+	childProcess,
 	EventContext,
 	EventHandler,
 	git,
 	github,
+	log,
 	project,
 	repository,
 	runSteps,
 	secret,
 	Step,
 	status,
-	childProcess,
 } from "@atomist/skill";
-import { Severity } from "@atomist/skill-logging";
 import * as fs from "fs-extra";
 import {
 	DefaultLintConfiguration,
@@ -118,7 +118,7 @@ const NpmInstallStep: LintStep = {
 	},
 	run: async (ctx, params) => {
 		const opts = { env: { ...process.env, NODE_ENV: "development" } };
-		let result;
+		let result: childProcess.SpawnPromiseReturns;
 		if (await fs.pathExists(params.project.path("package-lock.json"))) {
 			result = await params.project.spawn(
 				"npm",
@@ -263,8 +263,11 @@ const RunEslintStep: LintStep = {
 				`Prettier found [${repo.owner}/${repo.name}](${repo.url}) not to be formatted properly`,
 			);
 		} else if (result.exitCode === 2) {
-			await ctx.audit.log(`Running Prettier errored:`, Severity.Error);
-			await ctx.audit.log(result.log, Severity.Error);
+			await ctx.audit.log(
+				`Running Prettier errored:`,
+				log.Severity.Error,
+			);
+			await ctx.audit.log(result.log, log.Severity.Error);
 			await params.check.update({
 				conclusion: "action_required",
 				body: `Running \`prettier\` errored
