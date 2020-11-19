@@ -85,21 +85,6 @@ const SetupStep: LintStep = {
 			} at sha ${push.after.sha.slice(0, 7)}`,
 		);
 
-		const includeGlobs = ctx.configuration?.parameters?.glob || ".";
-		const matchingFiles = await project.globFiles(
-			params.project,
-			includeGlobs,
-			{
-				ignore: [".git", "node_modules"],
-			},
-		);
-		if (matchingFiles.length === 0) {
-			return status
-				.success("Project does not contain any matching files")
-				.hidden()
-				.abort();
-		}
-
 		params.check = await github.createCheck(ctx, params.project.id, {
 			sha: push.after.sha,
 			name: "prettier-skill",
