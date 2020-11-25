@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist-skills/prettier-skill/compare/1.0.1...HEAD)
 
+### Changed
+
+-   Allow prettier configuration to be set in non-npm projects. [#112](https://github.com/atomist-skills/prettier-skill/issues/112)
+
 ## [1.0.1](https://github.com/atomist-skills/prettier-skill/compare/1.0.0...1.0.1) - 2020-11-19
 
 ### Removed
