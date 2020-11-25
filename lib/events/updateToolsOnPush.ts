@@ -93,18 +93,17 @@ const SetupStep: UpdateStep = {
 			} at sha ${push.after.sha.slice(0, 7)}`,
 		);
 
-		if (!(await fs.pathExists(params.project.path("package.json")))) {
-			return status.failure("Project is not an npm project").hidden();
-		}
-
 		return status.success();
 	},
 };
 
 const NpmInstallStep: UpdateStep = {
 	name: "npm install",
-	runWhen: async ctx => {
-		return ctx.configuration?.parameters?.modules?.length > 0;
+	runWhen: async (ctx, params) => {
+		return (
+			(await fs.pathExists(params.project.path("package.json"))) &&
+			ctx.configuration?.parameters?.modules?.length > 0
+		);
 	},
 	run: async (ctx, params) => {
 		const opts = { env: { ...process.env, NODE_ENV: "development" } };
@@ -169,8 +168,11 @@ const ConfigureEslintStep: UpdateStep = {
 
 const ConfigureHooksStep: UpdateStep = {
 	name: "configure hooks",
-	runWhen: async ctx => {
-		return ctx.configuration?.parameters?.configure === "prettier_and_hook";
+	runWhen: async (ctx, params) => {
+		return (
+			(await fs.pathExists(params.project.path("package.json"))) &&
+			ctx.configuration?.parameters?.configure === "prettier_and_hook"
+		);
 	},
 	run: async (ctx, params) => {
 		const push = ctx.data.Push[0];
