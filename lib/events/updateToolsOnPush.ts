@@ -61,7 +61,7 @@ const SetupStep: UpdateStep = {
 
 		if (ctx.configuration?.parameters?.configure === "none") {
 			return status
-				.failure(`No configuration updates requested`)
+				.success(`No configuration updates requested`)
 				.hidden();
 		}
 
