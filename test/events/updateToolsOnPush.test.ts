@@ -19,6 +19,7 @@ import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
 import * as assert from "power-assert";
+
 import { updateLintConfiguration } from "../../lib/events/updateToolsOnPush";
 
 describe("updateToolsOnPush", () => {
