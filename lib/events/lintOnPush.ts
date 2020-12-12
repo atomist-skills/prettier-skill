@@ -25,10 +25,11 @@ import {
 	repository,
 	runSteps,
 	secret,
-	Step,
 	status,
+	Step,
 } from "@atomist/skill";
 import * as fs from "fs-extra";
+
 import {
 	DefaultLintConfiguration,
 	LintConfiguration,
