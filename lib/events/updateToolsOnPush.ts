@@ -19,6 +19,7 @@ import {
 	EventHandler,
 	git,
 	github,
+	log,
 	project,
 	repository,
 	runSteps,
@@ -66,7 +67,7 @@ const SetupStep: UpdateStep = {
 				.hidden();
 		}
 
-		await ctx.audit.log(
+		log.info(
 			`Updating Prettier configuration on ${repo.owner}/${repo.name}`,
 		);
 
@@ -88,7 +89,7 @@ const SetupStep: UpdateStep = {
 			}),
 			{ alwaysDeep: false, detachHead: false },
 		);
-		await ctx.audit.log(
+		log.info(
 			`Cloned repository ${repo.owner}/${
 				repo.name
 			} at sha ${push.after.sha.slice(0, 7)}`,
@@ -117,7 +118,7 @@ const NpmInstallStep: UpdateStep = {
 				!pj.devDependencies?.[moduleName(m)],
 		);
 		if (modules.length > 0) {
-			await ctx.audit.log("Installing configured npm packages");
+			log.info("Installing configured npm packages");
 			const result = await params.project.spawn(
 				"npm",
 				["install", ...modules, ...NpmDevInstallArgs],

@@ -60,7 +60,7 @@ const SetupStep: LintStep = {
 			return status.success(`Ignore generated branch`).hidden().abort();
 		}
 
-		await ctx.audit.log(`Starting Prettier on ${repo.owner}/${repo.name}`);
+		log.info(`Starting Prettier on ${repo.owner}/${repo.name}`);
 
 		params.credential = await ctx.credential.resolve(
 			secret.gitHubAppToken({
@@ -80,7 +80,7 @@ const SetupStep: LintStep = {
 			}),
 			{ alwaysDeep: false, detachHead: false },
 		);
-		await ctx.audit.log(
+		log.info(
 			`Cloned repository ${repo.owner}/${
 				repo.name
 			} at sha ${push.after.sha.slice(0, 7)}`,
@@ -124,7 +124,7 @@ const NpmInstallStep: LintStep = {
 
 		const cfg = ctx.configuration?.parameters;
 		if (cfg.modules?.length > 0) {
-			await ctx.audit.log("Installing configured npm packages");
+			log.info("Installing configured npm packages");
 			result = await params.project.spawn(
 				"npm",
 				["install", ...cfg.modules, ...NpmDevInstallArgs],
@@ -220,7 +220,7 @@ const RunEslintStep: LintStep = {
 			.join(" ")
 			.split(`${params.project.path()}/`)
 			.join("");
-		await ctx.audit.log(`Running Prettier with: $ prettier ${argsString}`);
+		log.info(`Running Prettier with: $ prettier ${argsString}`);
 		const result = await runPrettier(args, ctx, params);
 
 		for (const file of filesToDelete) {
@@ -249,11 +249,8 @@ const RunEslintStep: LintStep = {
 				`Prettier found [${repo.owner}/${repo.name}](${repo.url}) not to be formatted properly`,
 			);
 		} else if (result.exitCode === 2) {
-			await ctx.audit.log(
-				`Running Prettier errored:`,
-				log.Severity.Error,
-			);
-			await ctx.audit.log(result.log, log.Severity.Error);
+			log.error(`Running Prettier errored:`);
+			log.error(result.log);
 			await params.check.update({
 				conclusion: "action_required",
 				body: `Running \`prettier\` errored
