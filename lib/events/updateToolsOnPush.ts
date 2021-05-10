@@ -293,21 +293,19 @@ const ClosePrStep: UpdateStep = {
 	},
 };
 
-export const handler: EventHandler<
-	LintOnPushSubscription,
-	LintConfiguration
-> = async ctx =>
-	runSteps({
-		context: ctx,
-		steps: [
-			SetupStep,
-			NpmInstallStep,
-			ConfigureEslintStep,
-			ConfigureHooksStep,
-			ClosePrStep,
-			PushStep,
-		],
-	});
+export const handler: EventHandler<LintOnPushSubscription, LintConfiguration> =
+	async ctx =>
+		runSteps({
+			context: ctx,
+			steps: [
+				SetupStep,
+				NpmInstallStep,
+				ConfigureEslintStep,
+				ConfigureHooksStep,
+				ClosePrStep,
+				PushStep,
+			],
+		});
 
 export function moduleName(module: string): string {
 	const ix = module.lastIndexOf("@");

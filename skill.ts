@@ -117,8 +117,7 @@ export const Skill = skill<LintConfiguration & { repos: any }>({
 				"Update repositories to use the skill's Prettier configuration",
 			options: [
 				{
-					text:
-						"Update Prettier config, ignore files and install Git commit hooks",
+					text: "Update Prettier config, ignore files and install Git commit hooks",
 					value: "prettier_and_hook",
 				},
 				{
