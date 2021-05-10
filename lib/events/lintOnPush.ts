@@ -387,18 +387,16 @@ const ClosePrStep: LintStep = {
 	},
 };
 
-export const handler: EventHandler<
-	LintOnPushSubscription,
-	LintConfiguration
-> = async ctx =>
-	runSteps({
-		context: ctx,
-		steps: [
-			SetupStep,
-			NpmInstallStep,
-			ValidateRepositoryStep,
-			RunEslintStep,
-			ClosePrStep,
-			PushStep,
-		],
-	});
+export const handler: EventHandler<LintOnPushSubscription, LintConfiguration> =
+	async ctx =>
+		runSteps({
+			context: ctx,
+			steps: [
+				SetupStep,
+				NpmInstallStep,
+				ValidateRepositoryStep,
+				RunEslintStep,
+				ClosePrStep,
+				PushStep,
+			],
+		});
